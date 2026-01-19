@@ -22,6 +22,7 @@ typedef struct {
 		bool verbose_mode;
 		bool check_sha256;
 		bool overwrite;
+		bool fsync;
 } parser_options;
 
 void print_help_message();

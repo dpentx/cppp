@@ -1,4 +1,5 @@
 #include "cli_parser.h"
+#include <bits/getopt_ext.h>
 
 void print_help_message() {
 	printf("Usage: cppp [OPTIONS]\n\n");
@@ -10,7 +11,8 @@ void print_help_message() {
 	printf("  -c, --check-sha256   Enable verifying SHA-256 checksum after copying.\n");
 	printf("  -h, --help           Display this help message.\n");
 	printf("  -v, --verbose        Enable verbose logging.\n");
-	printf("  -f --force           Enable overwriting on existing file.\n");
+	printf("  -f, --force          Enable overwriting on existing file.\n");
+	printf("  -F, --fsync          Enable fsync() call after finishing copy operation for per file.\n");
 	printf("  -V, --version        Show program version information.\n\n");
 }
 
@@ -33,8 +35,9 @@ parser_options parse_cli(int argc, char *argv[]) {
 	parser_options.verbose_mode = false;
 	parser_options.check_sha256 = false;
 	parser_options.overwrite = false;
+	parser_options.fsync = false;
 
-	const char *short_options = "m:i:o:p:hcfvV";
+	const char *short_options = "m:i:o:p:hcfFvV";
 
 	static struct option long_options[] = {
 		/*
@@ -53,6 +56,7 @@ parser_options parse_cli(int argc, char *argv[]) {
 		{"check-sha256", no_argument, 0, 'c'},
 		{"verbose", no_argument, 0, 'v'},
 		{"force", no_argument, 0, 'f'},
+		{"fsync", no_argument, 0, 'F'},
 		{"version", no_argument, 0, 'V'},
 		{0, 0, 0, 0}};
 
@@ -103,6 +107,9 @@ parser_options parse_cli(int argc, char *argv[]) {
 				break;
 			case 'f':
 				parser_options.overwrite = true;
+				break;
+			case 'F':
+				parser_options.fsync = true;
 				break;
 			case 'h':
 				print_help_message();

@@ -1,5 +1,5 @@
-#include "sha256.h"
 #include "progress_bar.h"
+#include "sha256.h"
 
 ErrorCode calculate_sha256(const char *file_name, char hash_str[HASH_STR_LEN], parser_options cli_options) {
 	file_info file_info = get_file_info(file_name, 1);
@@ -57,7 +57,7 @@ ErrorCode calculate_sha256(const char *file_name, char hash_str[HASH_STR_LEN], p
 				float speed_MBps = (elapsed > 0) ? ((float)offset / (1024 * 1024)) / elapsed : 0.0f;
 				float remaining = (file_size - offset) / (1024.0 * 1024.0);
 				int eta_seconds = (speed_MBps > 0) ? (int)(remaining / speed_MBps) : 0;
-				print_progress(file_size, offset, speed_MBps, eta_seconds, elapsed);
+				print_progress(file_size, offset, speed_MBps, eta_seconds, elapsed, 1, 1);
 				last_update = current_time;
 			}
 		}

@@ -53,9 +53,10 @@ ErrorCode init_process(parser_options cli_options) {
 				} else if (status == ERR_COPY_DIR_MKDIR_FAIL) {
 					print_failure("ERR_COPY_DIR_MKDIR_FAIL: '%s' couldn't be copied", src_info.file_name);
 				} else if (status == ERR_OK) {
-					print_success("'%s' copied to '%s'", src_info.file_name, dst_info.file_name);
+					if (cli_options.verbose_mode) {
+						print_success("'%s' copied to '%s'", src_info.file_name, dst_info.file_name);
+					}
 				}
-
 			} else if (S_ISREG(src_info.st_mode)) {
 				if (strcmp(src_info.file_name, dst_info.file_name) == 0) {
 					print_err("ERR_COPY_SAME_FILE_INPUT: '%s' and '%s' are the same file", src_info.file_name, dst_info.file_name);
@@ -71,10 +72,12 @@ ErrorCode init_process(parser_options cli_options) {
 					} else if (status == ERR_COPY_FILE_PART_COPY) {
 						print_failure("ERR_COPY_FILE_PART_COPY: '%s' couldn't be copied", src_info.file_name);
 					} else if (status == ERR_OK) {
-						print_success("'%s' copied to '%s'", src_info.file_name, dst_info.file_name);
+						if (cli_options.verbose_mode) {
+							print_success("'%s' copied to '%s'", src_info.file_name, dst_info.file_name);
+						}
 					}
 				} else if (dst_info.status == -1) {
-					if (fileCount > 0 && directoryCount == 0) {
+					if (fileCount > 1 && directoryCount == 0) {
 						char output[PATH_MAX];
 						snprintf(output, sizeof(output), "%s/%s", dst_info.file_name, get_only_file_name(src_info.file_name));
 						mkdir_p(dst_info.file_name, src_info.dir_permissions);
@@ -84,7 +87,20 @@ ErrorCode init_process(parser_options cli_options) {
 						} else if (status == ERR_COPY_FILE_PART_COPY) {
 							print_failure("ERR_COPY_FILE_PART_COPY: '%s' couldn't be copied", src_info.file_name);
 						} else if (status == ERR_OK) {
-							print_success("'%s' copied to '%s'", src_info.file_name, dst_info.file_name);
+							if (cli_options.verbose_mode) {
+								print_success("'%s' copied to '%s'", src_info.file_name, dst_info.file_name);
+							}
+						}
+					} else if (fileCount == 1 && directoryCount == 0) {
+						ErrorCode status = copy(src_info.file_name, dst_info.file_name, cli_options.num_parts, cli_options);
+						if (status == ERR_COPY_FILE_FULL_FAIL) {
+							print_failure("ERR_COPY_FILE_FULL_FAIL: '%s' couldn't be copied", src_info.file_name);
+						} else if (status == ERR_COPY_FILE_PART_COPY) {
+							print_failure("ERR_COPY_FILE_PART_COPY: '%s' couldn't be copied", src_info.file_name);
+						} else if (status == ERR_OK) {
+							if (cli_options.verbose_mode) {
+								print_success("'%s' copied to '%s'", src_info.file_name, dst_info.file_name);
+							}
 						}
 					} else if (fileCount > 0 && directoryCount > 0) {
 						char output[PATH_MAX];
@@ -96,7 +112,9 @@ ErrorCode init_process(parser_options cli_options) {
 						} else if (status == ERR_COPY_FILE_PART_COPY) {
 							print_failure("ERR_COPY_FILE_PART_COPY: '%s' couldn't be copied", src_info.file_name);
 						} else if (status == ERR_OK) {
-							print_success("'%s' copied to '%s'", src_info.file_name, dst_info.file_name);
+							if (cli_options.verbose_mode) {
+								print_success("'%s' copied to '%s'", src_info.file_name, dst_info.file_name);
+							}
 						}
 					}
 				} else if (dst_info.status == 0) {
@@ -107,12 +125,12 @@ ErrorCode init_process(parser_options cli_options) {
 						} else if (status == ERR_COPY_FILE_PART_COPY) {
 							print_failure("ERR_COPY_FILE_PART_COPY: '%s' couldn't be copied", src_info.file_name);
 						} else if (status == ERR_OK) {
-							print_success("'%s' copied to '%s'", src_info.file_name, dst_info.file_name);
+							if (cli_options.verbose_mode) {
+								print_success("'%s' copied to '%s'", src_info.file_name, dst_info.file_name);
+							}
 						}
 					} else {
 						print_err("ERR_COPY_FILE_NOT_ALLOWED: no overwrite permission");
-						print_err("src: %s", src_info.file_name);
-						print_err("dst: %s", dst_info.file_name);
 						continue;
 					}
 				}
