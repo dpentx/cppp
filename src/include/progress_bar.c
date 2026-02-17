@@ -14,11 +14,10 @@ void format_elapsed(float seconds, char *buffer, size_t buffer_size) {
 
 float time_diff(struct timeval start, struct timeval end) {
 	return (float)(end.tv_sec - start.tv_sec) +
-           (float)(end.tv_usec - start.tv_usec) / 1000000.0f;
+		   (float)(end.tv_usec - start.tv_usec) / 1000000.0f;
 }
 
-void print_progress(off_t total, off_t current,
-                    float speed_MBps, int eta_seconds, float elapsed_seconds) {
+void print_progress(off_t total, off_t current, float speed_MBps, int eta_seconds, float elapsed_seconds, int current_part, int total_parts) {
 	printf("\033[?25l");
 	float progress = (float)current / total;
 	int filled_chars = (int)(progress * PROGRESS_BAR_WIDTH);
@@ -29,8 +28,7 @@ void print_progress(off_t total, off_t current,
 	format_eta(eta_seconds, eta_str, sizeof(eta_str));
 	format_elapsed(elapsed_seconds, elapsed_str, sizeof(elapsed_str));
 
-	//printf("\r%-17s[");
-	printf("\r[");
+	printf("\r\033[1m(%d/%d)\033[0m [", current_part, total_parts);
 
 	for (int i = 0; i < PROGRESS_BAR_WIDTH; ++i) {
 		if (i == dot_pos && !complete)
